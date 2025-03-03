@@ -245,8 +245,11 @@ export default function Command() {
         status: values.status,
         label: values.label || undefined,
         projectId: values.projectId || undefined,
-        workspaceId: selectedTask.workspaceId || preferences,
+        workspaceId: preferences,
       };
+
+      // Log the task update for debugging
+      console.log("Updating task with payload:", JSON.stringify(taskUpdate, null, 2));
 
       // Update the task
       await motionClient.updateTask(taskUpdate);
