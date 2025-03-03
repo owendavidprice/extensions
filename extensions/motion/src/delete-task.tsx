@@ -122,29 +122,6 @@ export default function Command() {
     }
   }
 
-  // Format the due date
-  function formatDueDate(dateString?: string) {
-    if (!dateString) return "No due date";
-
-    const dueDate = new Date(dateString);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const dueDay = new Date(dueDate);
-    dueDay.setHours(0, 0, 0, 0);
-
-    if (dueDay.getTime() === today.getTime()) {
-      return "Today";
-    } else if (dueDay.getTime() === tomorrow.getTime()) {
-      return "Tomorrow";
-    } else {
-      return dueDate.toLocaleDateString();
-    }
-  }
-
   // Get a relative description of the due date
   function getRelativeDate(dateString?: string): string {
     if (!dateString) return "Not scheduled";
@@ -222,23 +199,6 @@ export default function Command() {
     }
   }
 
-  // Safely get task label as string, or empty array if it's an object
-  function getTaskLabels(label: string | string[] | null | undefined): string[] {
-    // If it's not defined, return empty array
-    if (!label) return [];
-
-    // If it's a simple string, return as an array with one item
-    if (typeof label === "string") return [label];
-
-    // If it's an array of strings, return it
-    if (Array.isArray(label) && label.every((item) => typeof item === "string")) {
-      return label;
-    }
-
-    // Default case, return empty array
-    return [];
-  }
-
   // Safe HTML remover
   function removeHtml(text?: string): string {
     if (!text) return "";
@@ -252,6 +212,17 @@ export default function Command() {
       onSearchTextChange={setSearchText}
       searchBarPlaceholder="Search tasks..."
       throttle
+      searchBarAccessory={
+        <List.Dropdown
+          tooltip="View options"
+          storeValue={true}
+          onChange={() => {
+            /* This is just to create a header, no action needed */
+          }}
+        >
+          <List.Dropdown.Item title="Task | Priority | Scheduled For" value="header" />
+        </List.Dropdown>
+      }
     >
       <List.Section title="Tasks" subtitle={filteredTasks.length.toString()}>
         {filteredTasks.map((task) => (
@@ -265,10 +236,6 @@ export default function Command() {
                 tooltip: "Priority",
               },
               {
-                text: formatDueDate(task.dueDate),
-                tooltip: "Due Date",
-              },
-              {
                 text: getRelativeDate(task.dueDate),
                 tooltip: "Scheduled For",
               },
@@ -279,11 +246,6 @@ export default function Command() {
                 },
                 tooltip: "Status",
               },
-              // Map each label to a tag, but only if we have valid string labels
-              ...getTaskLabels(task.label).map((label) => ({
-                tag: { value: label },
-                tooltip: "Label",
-              })),
             ]}
             actions={
               <ActionPanel>
