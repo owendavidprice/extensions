@@ -6,10 +6,21 @@ type Values = {
   name: string;
   description: string;
   dueDate: Date;
-  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+  priority: "LOW" | "MEDIUM" | "HIGH" | "ASAP";
   status: "TODO" | "IN_PROGRESS" | "DONE";
   label: string;
   projectId: string;
+};
+
+// Define the task payload type to match what we're creating
+type TaskPayload = {
+  title: string;
+  description: string;
+  dueDate: Date;
+  priority: "LOW" | "MEDIUM" | "HIGH" | "ASAP";
+  status: "TODO" | "IN_PROGRESS" | "DONE";
+  label?: string;
+  projectId?: string;
 };
 
 // Helper function to get tomorrow's date
@@ -57,7 +68,7 @@ export default function Command() {
       const motionClient = getMotionApiClient();
 
       // Create a task payload with required fields
-      const taskPayload = {
+      const taskPayload: TaskPayload = {
         title: values.name,
         description: values.description,
         dueDate: values.dueDate,
@@ -120,7 +131,7 @@ export default function Command() {
         <Form.Dropdown.Item value="LOW" title="Low" />
         <Form.Dropdown.Item value="MEDIUM" title="Medium" />
         <Form.Dropdown.Item value="HIGH" title="High" />
-        <Form.Dropdown.Item value="URGENT" title="Urgent" />
+        <Form.Dropdown.Item value="ASAP" title="ASAP" />
       </Form.Dropdown>
 
       <Form.Dropdown id="status" title="Status" defaultValue="TODO">
@@ -138,7 +149,7 @@ export default function Command() {
 
       <Form.Dropdown id="projectId" title="Project">
         <Form.Dropdown.Item value="" title="None" />
-        {projects.map((project) => (
+        {projects.map((project: Project) => (
           <Form.Dropdown.Item key={project.id} value={project.id} title={project.name} />
         ))}
       </Form.Dropdown>
